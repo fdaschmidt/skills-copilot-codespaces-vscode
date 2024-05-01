@@ -14,10 +14,11 @@
 //   { id: 4, author: "user4", content: "content4" },
 // ];
 
-const express = require("express");
+// Path: comments.js
 const fs = require("fs");
+const express = require("express");
 const app = express();
-const PORT = 3000;
+const port = 3000;
 
 app.use(express.json());
 
@@ -39,16 +40,40 @@ app.post("/comments", (req, res) => {
 });
 
 app.get("/comments/:id", (req, res) => {
-  const id = req.params.id;
-  const comment = comments.find((comment) => comment.id == id);
+  const id = Number(req.params.id);
+  const comment = comments.find((comment) => comment.id === id);
   if (comment) {
     res.json(comment);
   } else {
-    res.status(404).json({ message: "Comment not found" });
+    res.status(404).send("Comment not found");
   }
 });
 
 app.put("/comments/:id", (req, res) => {
-  const id = req.params.id;
-  const updatedComment = req.body;
-  const commentIndex = comments.findIndex((comment) => comment
+  const id = Number(req.params.id);
+  const index = comments.findIndex((comment) => comment.id === id);
+  if (index !== -1) {
+    comments[index] = req.body;
+    res.json(comments[index]);
+  } else {
+    res.status(404).send("Comment not found");
+  }
+});
+
+app.delete("/comments/:id", (req, res) => {
+  const id = Number(req.params.id);
+  const index = comments.findIndex((comment) => comment.id === id);
+  if (index !== -1) {
+    comments.splice(index, 1);
+    res.send("Comment deleted");
+  } else {
+    res.status(404).send("Comment not found");
+  }
+});
+
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
+});
+
+// Test the server
+// Use curl or Postman to test the
